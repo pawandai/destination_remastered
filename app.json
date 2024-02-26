@@ -25,6 +25,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "515bf7ed-57a8-4189-8279-951485efa38d"
+      }
+    },
+    "owner": "pawan1awasthi"
   }
 }
