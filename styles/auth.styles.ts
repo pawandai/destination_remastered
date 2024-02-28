@@ -7,10 +7,12 @@ export const loginStyles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: 0,
     width: '100%',
+    backgroundColor: '#fff',
   },
   formContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    backgroundColor: 'rgba(0, 0, 0, 0.01)',
     padding: 20,
+    paddingVertical: 30,
     borderRadius: 10,
     width: '90%',
     marginTop: 20,

@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { TextInput, Title, Button } from 'react-native-paper';
 import { loginStyles } from '../styles/auth.styles';
 
-export default function SignUpScreen() {
+export default function SignUpScreen({ navigation }: { navigation: any }) {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [fullName, setFullName] = useState<string>('');
@@ -12,7 +12,7 @@ export default function SignUpScreen() {
   return (
     <View style={loginStyles.container}>
       <View style={loginStyles.formContainer}>
-        <Title style={loginStyles.title}>Sign In</Title>
+        <Title style={loginStyles.title}>Sign Up</Title>
         <TextInput
           label='Full Name'
           value={fullName}
@@ -57,8 +57,10 @@ export default function SignUpScreen() {
       </View>
       <Button
         style={{ width: '80%' }}
-        icon='account-question-outline'
-        onPress={() => {}}
+        icon='account-outline'
+        onPress={() => {
+          navigation.navigate('Login');
+        }}
       >
         Already have an account? Log In
       </Button>

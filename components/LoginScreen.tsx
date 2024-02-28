@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { TextInput, Title, Button } from 'react-native-paper';
 import { loginStyles } from '../styles/auth.styles';
 
-export default function LoginScreen() {
+export default function LoginScreen({ navigation }: { navigation: any }) {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
 
@@ -43,7 +43,9 @@ export default function LoginScreen() {
       <Button
         style={{ width: '80%' }}
         icon='account-question-outline'
-        onPress={() => {}}
+        onPress={() => {
+          navigation.navigate('Signup');
+        }}
       >
         Don't have an account? Register here
       </Button>

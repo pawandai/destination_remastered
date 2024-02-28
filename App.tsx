@@ -1,13 +1,12 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View } from 'react-native';
-import LoginScreen from './components/LoginScreen';
+import { StyleSheet } from 'react-native';
+import AuthScreen from './components/auth/AuthScreen';
+import { NavigationContainer } from '@react-navigation/native';
 
 export default function App() {
   return (
-    <View style={styles.maxWidthContainer}>
-      <LoginScreen />
-      <StatusBar style='auto' />
-    </View>
+    <NavigationContainer>
+      <AuthScreen />
+    </NavigationContainer>
   );
 }
 
