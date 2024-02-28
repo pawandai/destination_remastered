@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "destination",
-    "slug": "destination",
+    "slug": "destination-australia",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -22,14 +22,14 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.pawan.destination"
+      "package": "com.pawan.destinationaustralia"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "extra": {
       "eas": {
-        "projectId": "515bf7ed-57a8-4189-8279-951485efa38d"
+        "projectId": "9d95eea1-282d-4826-9f11-58bdfb49b5d1"
       }
     },
     "owner": "pawan1awasthi"

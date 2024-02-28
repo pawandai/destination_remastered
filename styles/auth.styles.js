@@ -28,6 +28,7 @@ export const loginStyles = StyleSheet.create({
     backgroundColor: 'transparent',
     borderRadius: 20,
     fontSize: 17,
+    paddingHorizontal: 10,
   },
   signInButton: {
     marginTop: 20,

@@ -1,17 +1,13 @@
 import { StyleSheet, View } from 'react-native';
-import LoginScreen from '../LoginScreen';
 import { StatusBar } from 'expo-status-bar';
 import {
   createStackNavigator,
   TransitionPresets,
 } from '@react-navigation/stack';
-import SignUpScreen from '../SignUpScreen';
-import React, { Suspense } from 'react';
+import LoginScreen from '../shared/LoginScreen';
+import SignUpScreen from '../shared/SignupScreen';
 
 const Stack = createStackNavigator();
-
-const LazyLoginScreen = React.lazy(() => import('../LoginScreen'));
-const LazySignUpScreen = React.lazy(() => import('../SignUpScreen'));
 
 export default function AuthScreen() {
   return (

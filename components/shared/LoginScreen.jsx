@@ -1,24 +1,16 @@
 import { useState } from 'react';
 import { View } from 'react-native';
 import { TextInput, Title, Button } from 'react-native-paper';
-import { loginStyles } from '../styles/auth.styles';
+import { loginStyles } from '../../styles/auth.styles';
 
-export default function SignUpScreen({ navigation }: { navigation: any }) {
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [fullName, setFullName] = useState<string>('');
-  const [confirmPassword, setConfirmPassword] = useState<string>('');
+export default function LoginScreen({ navigation }) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   return (
     <View style={loginStyles.container}>
       <View style={loginStyles.formContainer}>
-        <Title style={loginStyles.title}>Sign Up</Title>
-        <TextInput
-          label='Full Name'
-          value={fullName}
-          onChangeText={(text) => setFullName(text)}
-          style={loginStyles.input}
-        />
+        <Title style={loginStyles.title}>Sign In</Title>
         <TextInput
           label='Email'
           value={email}
@@ -32,19 +24,12 @@ export default function SignUpScreen({ navigation }: { navigation: any }) {
           secureTextEntry
           style={loginStyles.input}
         />
-        <TextInput
-          label='Confirm Password'
-          value={confirmPassword}
-          onChangeText={(text) => setConfirmPassword(text)}
-          secureTextEntry
-          style={loginStyles.input}
-        />
         <Button
           style={loginStyles.signInButton}
           icon='account-arrow-right'
           onPress={() => {}}
         >
-          Sign Up
+          Sign In
         </Button>
         <Button
           mode='elevated'
@@ -57,12 +42,12 @@ export default function SignUpScreen({ navigation }: { navigation: any }) {
       </View>
       <Button
         style={{ width: '80%' }}
-        icon='account-outline'
+        icon='account-question-outline'
         onPress={() => {
-          navigation.navigate('Login');
+          navigation.navigate('Signup');
         }}
       >
-        Already have an account? Log In
+        Don't have an account? Register here
       </Button>
     </View>
   );
