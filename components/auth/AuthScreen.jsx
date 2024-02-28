@@ -1,5 +1,4 @@
 import { StyleSheet, View } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 import {
   createStackNavigator,
   TransitionPresets,
@@ -23,7 +22,6 @@ export default function AuthScreen() {
         <Stack.Screen name='Login' component={LoginScreen} />
         <Stack.Screen name='Signup' component={SignUpScreen} />
       </Stack.Navigator>
-      <StatusBar style='auto' />
     </View>
   );
 }
