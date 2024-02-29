@@ -5,6 +5,7 @@ import { TextInput, Title, Button } from 'react-native-paper';
 import { loginStyles } from '../../styles/auth.styles';
 import { auth } from '../../database/firebaseConfig';
 import Toast from 'react-native-toast-message';
+// import { collection, addDoc } from 'firebase/firestore';
 
 export default function SignUpScreen({ navigation }) {
   const [email, setEmail] = useState('');
@@ -25,7 +26,24 @@ export default function SignUpScreen({ navigation }) {
         },
       });
     } else {
-      createUserWithEmailAndPassword(auth, email, password);
+      createUserWithEmailAndPassword(auth, email, password).then(
+        async (userCredential) => {
+          const user = userCredential.user;
+          user.displayName = fullName;
+          console.log(user);
+          // try {
+          //   const docRef = await addDoc(collection(db, 'users'), {
+          //     name: fullName,
+          //     email: email,
+          //     born: 1815,
+          //   });
+          //   console.log('Document written with ID: ', docRef.id);
+          // } catch (e) {
+          //   console.error('Error adding document: ', e);
+          // }
+        }
+      );
+      navigation.navigate('HomePage');
     }
   };
 

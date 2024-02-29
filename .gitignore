@@ -3,6 +3,7 @@
 # dependencies
 node_modules/
 google/
+database/firebaseConfig.js
 
 # Expo
 .expo/
