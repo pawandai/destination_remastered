@@ -1,12 +1,14 @@
 import { StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import Toast from 'react-native-toast-message';
 import { NavigationContainer } from '@react-navigation/native';
-import NewPost from './components/ui/NewPost';
+import AuthScreen from './components/auth/AuthScreen';
 
 export default function App() {
   return (
     <NavigationContainer>
-      <NewPost />
+      <AuthScreen />
+      <Toast />
       <StatusBar style='auto' />
     </NavigationContainer>
   );
