@@ -17,7 +17,7 @@ export default function AuthScreen() {
         screenOptions={{
           headerShown: false,
           gestureEnabled: true,
-          ...TransitionPresets.SlideFromRightIOS, // Apply slide from right animation
+          ...TransitionPresets.SlideFromRightIOS,
         }}
       >
         <Stack.Screen name='Login' component={LoginScreen} />

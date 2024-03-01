@@ -11,20 +11,28 @@ export default function LoginScreen({ navigation }) {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const logIn = () => {
+  const logIn = async () => {
     setIsLoading(true);
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         // Signed in
         const user = userCredential.user;
         navigation.navigate('HomePage');
+        Toast.show({
+          type: 'success',
+          text1: 'User logged in successfully',
+          text1Style: {
+            fontSize: 17,
+            fontWeight: '400',
+            textAlign: 'center',
+            color: 'rgb(0, 0, 0)',
+          },
+        });
         setEmail('');
         setPassword('');
-        setTimeout(() => {
-          setIsLoading(false);
-        }, 3000);
       })
       .catch((error) => {
+        console.log(error);
         Toast.show({
           type: 'error',
           text1: 'Please provide correct email and password',
@@ -35,6 +43,10 @@ export default function LoginScreen({ navigation }) {
             color: 'rgb(255, 0, 0)',
           },
         });
+        setIsLoading(false);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
 
@@ -90,7 +102,6 @@ export default function LoginScreen({ navigation }) {
         icon='account-question-outline'
         onPress={() => {
           navigation.navigate('Signup');
-          logIn();
         }}
       >
         Don't have an account? Register here

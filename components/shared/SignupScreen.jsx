@@ -1,17 +1,18 @@
 import { useState } from 'react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { KeyboardAvoidingView, View } from 'react-native';
+import { KeyboardAvoidingView, Text, View } from 'react-native';
 import { TextInput, Title, Button } from 'react-native-paper';
 import { loginStyles } from '../../styles/auth.styles';
-import { auth } from '../../database/firebaseConfig';
+import { auth, db } from '../../database/firebaseConfig';
 import Toast from 'react-native-toast-message';
-// import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc } from 'firebase/firestore';
 
 export default function SignUpScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const createNewUser = () => {
     if (password !== confirmPassword) {
@@ -26,26 +27,64 @@ export default function SignUpScreen({ navigation }) {
         },
       });
     } else {
-      createUserWithEmailAndPassword(auth, email, password).then(
-        async (userCredential) => {
+      createUserWithEmailAndPassword(auth, email, password)
+        .then(async (userCredential) => {
+          setIsLoading(true);
           const user = userCredential.user;
-          user.displayName = fullName;
           console.log(user);
-          // try {
-          //   const docRef = await addDoc(collection(db, 'users'), {
-          //     name: fullName,
-          //     email: email,
-          //     born: 1815,
-          //   });
-          //   console.log('Document written with ID: ', docRef.id);
-          // } catch (e) {
-          //   console.error('Error adding document: ', e);
-          // }
-        }
-      );
-      navigation.navigate('HomePage');
+          try {
+            const docRef = await addDoc(collection(db, 'users'), {
+              id: user.uid,
+              name: fullName,
+              email: email,
+              dob: 2012,
+            });
+            console.log('Document written with ID: ', docRef.id);
+            Toast.show({
+              type: 'success',
+              text1: 'User created successfully',
+              text1Style: {
+                fontSize: 17,
+                fontWeight: '400',
+                textAlign: 'center',
+                color: 'rgb(0, 0, 0)',
+              },
+            });
+          } catch (e) {
+            console.error('Error adding document: ', e);
+          }
+          navigation.navigate('HomePage');
+        })
+        .catch(() => {
+          Toast.show({
+            type: 'error',
+            text1: 'Cound not create user in database',
+            text1Style: {
+              fontSize: 17,
+              fontWeight: '400',
+              textAlign: 'center',
+              color: 'rgb(255, 0, 0)',
+            },
+          });
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
     }
   };
+
+  if (isLoading)
+    return (
+      <View
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Text style={{ fontSize: 48 }}>Loading. Please Wait...</Text>
+      </View>
+    );
 
   return (
     <View style={loginStyles.container}>
