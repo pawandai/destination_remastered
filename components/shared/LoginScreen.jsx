@@ -17,6 +17,7 @@ export default function LoginScreen({ navigation }) {
       .then((userCredential) => {
         // Signed in
         const user = userCredential.user;
+        console.log('Here is logged in user: ', user);
         navigation.navigate('HomePage');
         Toast.show({
           type: 'success',

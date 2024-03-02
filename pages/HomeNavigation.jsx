@@ -3,6 +3,7 @@ import Tools from '../components/shared/Tools';
 import Profile from '../components/shared/Profile';
 import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import NewPost from '../components/ui/NewPost';
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -16,6 +17,20 @@ export default function HomeNavigation() {
           tabBarLabel: 'Home',
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons name='home' color={color} size={26} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name='Posts'
+        component={NewPost}
+        options={{
+          tabBarLabel: 'Posts',
+          tabBarIcon: ({ color }) => (
+            <MaterialCommunityIcons
+              name='post-outline'
+              color={color}
+              size={26}
+            />
           ),
         }}
       />

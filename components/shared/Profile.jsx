@@ -1,30 +1,49 @@
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { Text, View } from 'react-native';
 import { signOut } from 'firebase/auth';
 import { Button, Avatar } from 'react-native-paper';
 import { auth } from '../../database/firebaseConfig';
 import { NavigationContext } from '../../App';
+import ProfileUpdateForm from '../ui/ProfileUpdateForm';
 
 const Profile = () => {
   const navigation = useContext(NavigationContext);
-  const [profilePicture, setProfilePicture] = useState('');
+  const [profilePicture, setProfilePicture] = useState(null);
+  const [fullName, setFullName] = useState('');
 
-  // useEffect(() => {
-  //   auth.onAuthStateChanged((user) => {
-  //     if (user) {
-  //       setProfilePicture(user.photoURL);
-  //     }
-  //   });
-  // }, []);
+  useEffect(() => {
+    const unsubscribe = auth.onIdTokenChanged((user) => {
+      if (user) {
+        setProfilePicture(user.photoURL);
+        setFullName(user.displayName);
+      }
+    });
+
+    return unsubscribe;
+  }, []);
 
   return (
     <View>
       <Text style={{ fontSize: 48 }}>Profile</Text>
-      {/* {profilePicture ? (
-        <Avatar.Image size={24} source={require(profilePicture)} />
-      ) : ( */}
-      <Avatar.Icon size={24} icon='folder' />
-      {/* )} */}
+      <View
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 10,
+        }}
+      >
+        {profilePicture !== null ? (
+          <Avatar.Image size={48} source={profilePicture} />
+        ) : (
+          <Avatar.Icon size={48} icon='folder' />
+        )}
+
+        <Text>{fullName}</Text>
+      </View>
+
+      <ProfileUpdateForm />
+
       <Button
         onPress={() => {
           signOut(auth)

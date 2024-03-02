@@ -32,6 +32,14 @@
         "projectId": "9d95eea1-282d-4826-9f11-58bdfb49b5d1"
       }
     },
-    "owner": "pawan1awasthi"
+    "owner": "pawan1awasthi",
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "This app requires access to you gallery."
+        }
+      ]
+    ]
   }
 }

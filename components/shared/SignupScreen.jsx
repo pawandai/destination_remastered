@@ -6,6 +6,7 @@ import { loginStyles } from '../../styles/auth.styles';
 import { auth, db } from '../../database/firebaseConfig';
 import Toast from 'react-native-toast-message';
 import { collection, addDoc } from 'firebase/firestore';
+import { updateProfile } from 'firebase/auth';
 
 export default function SignUpScreen({ navigation }) {
   const [email, setEmail] = useState('');
@@ -15,6 +16,7 @@ export default function SignUpScreen({ navigation }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const createNewUser = () => {
+    setIsLoading(true);
     if (password !== confirmPassword) {
       Toast.show({
         type: 'error',
@@ -26,15 +28,17 @@ export default function SignUpScreen({ navigation }) {
           color: 'rgb(255, 0, 0)',
         },
       });
+      setIsLoading(false);
     } else {
       createUserWithEmailAndPassword(auth, email, password)
         .then(async (userCredential) => {
           setIsLoading(true);
-          const user = userCredential.user;
-          console.log(user);
+          updateProfile(auth.currentUser, {
+            displayName: fullName,
+          });
           try {
             const docRef = await addDoc(collection(db, 'users'), {
-              id: user.uid,
+              id: userCredential.user.uid,
               name: fullName,
               email: email,
               dob: 2012,
@@ -53,6 +57,7 @@ export default function SignUpScreen({ navigation }) {
           } catch (e) {
             console.error('Error adding document: ', e);
           }
+          setIsLoading(false);
           navigation.navigate('HomePage');
         })
         .catch(() => {
@@ -66,6 +71,7 @@ export default function SignUpScreen({ navigation }) {
               color: 'rgb(255, 0, 0)',
             },
           });
+          setIsLoading(false);
         })
         .finally(() => {
           setIsLoading(false);

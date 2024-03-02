@@ -14,7 +14,6 @@ export default function App() {
 
   useEffect(() => {
     const unsubscribe = auth.onIdTokenChanged((user) => {
-      console.log('here is unsubscribed user', user);
       if (user) {
         setIsAuthenticated(true);
       } else {
