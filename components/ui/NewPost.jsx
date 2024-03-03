@@ -4,10 +4,12 @@ import { TextInput, Button, Switch } from 'react-native-paper';
 import { loginStyles } from '../../styles/auth.styles';
 import { Avatar } from 'react-native-paper';
 import DropdownComponent from '../shared/Dropdown';
+import { auth } from '../../database/firebaseConfig';
 
 const NewPost = () => {
   const [isSwitchOn, setIsSwitchOn] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const user = auth.currentUser;
 
   return (
     <>
@@ -18,8 +20,8 @@ const NewPost = () => {
         <View style={loginStyles.container}>
           <View style={loginStyles.formContainer}>
             <View style={styles.avatar}>
-              <Avatar.Icon size={38} icon='folder' />
-              <Text style={styles.avatarText}>Pawan Awasthi</Text>
+              <Avatar.Image size={38} source={{ uri: user.photoURL }} />
+              <Text style={styles.avatarText}>{user.displayName}</Text>
             </View>
             <TextInput
               mode='outlined'

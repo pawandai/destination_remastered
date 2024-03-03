@@ -1,15 +1,37 @@
-import { Text, View, Image } from 'react-native';
-import { TextInput } from 'react-native-paper';
-import ImagePickerUI from '../shared/ImagePickerUI';
+import { View, Image } from 'react-native';
+import { TextInput, Button } from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useEffect, useState } from 'react';
 import { ref, uploadBytes, getDownloadURL } from '@firebase/storage';
 import { auth, storage } from '../../database/firebaseConfig';
+import { updateProfile } from 'firebase/auth';
+import * as ImagePicker from 'expo-image-picker';
+import { loginStyles } from '../../styles/auth.styles';
 
 const ProfileUpdateForm = () => {
   const [profileImage, setProfileImage] = useState(null);
-  const [profileImageUrl, setProfileImageUrl] = useState(null);
+  const [newName, setNewName] = useState('');
   const user = auth.currentUser;
+
+  useEffect(() => {
+    setNewName(user.displayName);
+  }, []);
+
+  // Grab image from the device
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      setProfileImage(result.assets[0].uri);
+    }
+  };
 
   // Upload profile image to Firebase storage
   useEffect(() => {
@@ -29,8 +51,9 @@ const ProfileUpdateForm = () => {
           await uploadBytes(imageRef, bytes);
 
           const url = await getDownloadURL(imageRef);
-          console.log('getDownloadUrl: ', url);
-          setProfileImageUrl(url);
+          updateProfile(user, {
+            photoURL: url,
+          });
         } catch (error) {
           console.log('error: ', error);
           return null;
@@ -42,32 +65,72 @@ const ProfileUpdateForm = () => {
   }, [profileImage]);
 
   return (
-    <View>
-      <Text>Image Picker</Text>
-      <View style={{ position: 'relative' }}>
-        {profileImageUrl ? (
-          <View style={{ borderRadius: '50%' }}>
+    <View
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: 50,
+      }}
+    >
+      <View
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'flex-end',
+          gap: -20,
+          marginBottom: 50,
+        }}
+      >
+        {user.photoURL || profileImage ? (
+          <View style={{ borderRadius: 100, overflow: 'hidden', zIndex: 9 }}>
             <Image
-              source={{ uri: profileImageUrl ? profileImageUrl : profileImage }}
-              style={{ width: 200, height: 200 }}
+              source={{ uri: profileImage ? profileImage : user.photoURL }}
+              style={{ width: 180, height: 180, borderRadius: 100 }}
             />
           </View>
         ) : (
           <MaterialCommunityIcons
             name='account-circle-outline'
             color={'#092303'}
-            size={200}
+            size={180}
           />
         )}
         <MaterialCommunityIcons
-          style={{ position: 'absolute', bottom: 0, right: '45%' }}
+          style={{ zIndex: 10 }}
           name='upload'
           color={'#092303'}
           size={40}
+          onPress={pickImage}
         />
       </View>
-      <ImagePickerUI setProfileImage={setProfileImage} />
-      <TextInput label='Name' />
+      <TextInput
+        value={newName}
+        name='Name'
+        mode='outlined'
+        label='Name'
+        style={{
+          width: '90%',
+          marginBottom: 25,
+          ...loginStyles.input,
+        }}
+        onChangeText={(text) => {
+          setNewName(text);
+        }}
+      />
+      <Button
+        mode='elevated'
+        style={{ ...loginStyles.signInButton }}
+        icon='upload'
+        onPress={() => {
+          // setRefreshing(true);
+          updateProfile(user, {
+            displayName: newName,
+          });
+        }}
+      >
+        Update Profile
+      </Button>
     </View>
   );
 };
