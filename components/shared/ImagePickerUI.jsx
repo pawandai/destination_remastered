@@ -1,10 +1,7 @@
-import React, { useState } from 'react';
 import { Button, Text, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 
 export default function ImagePickerUI({ setProfileImage }) {
-  const [image, setImage] = useState(null);
-
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -16,7 +13,6 @@ export default function ImagePickerUI({ setProfileImage }) {
     console.log(result);
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
       setProfileImage(result.assets[0].uri);
     }
   };

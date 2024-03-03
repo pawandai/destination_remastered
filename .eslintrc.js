@@ -1,11 +1,13 @@
 module.exports = {
+  parser: 'babel-eslint',
+  plugins: ['react', 'react-native'],
   env: {
-    browser: true,
-    es2021: true,
+    'react-native/react-native': true,
   },
-  extends: '@react-native',
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-  },
+  extends: [
+    'eslint:recommended',
+    'plugin:react/recommended',
+    'plugin:react-native/all',
+    '@react-native-community',
+  ],
 };

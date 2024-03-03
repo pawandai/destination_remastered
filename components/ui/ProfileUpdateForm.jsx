@@ -2,36 +2,53 @@ import { Text, View, Image } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import ImagePickerUI from '../shared/ImagePickerUI';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useState, useEffect } from 'react';
-import { auth } from '../../database/firebaseConfig';
-import { updateProfile } from 'firebase/auth';
-import { ref } from '@firebase/storage';
-import { storage } from '../../database/firebaseConfig';
+import { useEffect, useState } from 'react';
+import { ref, uploadBytes, getDownloadURL } from '@firebase/storage';
+import { auth, storage } from '../../database/firebaseConfig';
 
 const ProfileUpdateForm = () => {
-  const [profileImage, setProfileImage] = useState('');
+  const [profileImage, setProfileImage] = useState(null);
+  const [profileImageUrl, setProfileImageUrl] = useState(null);
+  const user = auth.currentUser;
 
-  const profilePictureRef = ref(storage, `images/profile/`);
+  // Upload profile image to Firebase storage
+  useEffect(() => {
+    const uploadImage = async () => {
+      if (profileImage == null) {
+        return null;
+      } else {
+        try {
+          const imageFilename =
+            user.email +
+            '/userImages/profileImages/' +
+            profileImage.substring(profileImage.lastIndexOf('/') + 1);
 
-  useEffect(async () => {
-    const response = await fetch(profileImage);
-    const blob = response.blob();
-    const filename = profileImage.substring(profileImage.lastIndexOf('/') + 1);
-    profilePictureRef.child(filename).put(blob);
+          const imageRef = ref(storage, imageFilename);
+          const img = await fetch(profileImage);
+          const bytes = await img.blob();
+          await uploadBytes(imageRef, bytes);
 
-    updateProfile(auth.currentUser, {
-      photoURL: uploadedImage,
-    });
+          const url = await getDownloadURL(imageRef);
+          console.log('getDownloadUrl: ', url);
+          setProfileImageUrl(url);
+        } catch (error) {
+          console.log('error: ', error);
+          return null;
+        }
+      }
+    };
+
+    uploadImage();
   }, [profileImage]);
 
   return (
     <View>
       <Text>Image Picker</Text>
       <View style={{ position: 'relative' }}>
-        {profileImage ? (
+        {profileImageUrl ? (
           <View style={{ borderRadius: '50%' }}>
             <Image
-              source={{ uri: profileImage }}
+              source={{ uri: profileImageUrl ? profileImageUrl : profileImage }}
               style={{ width: 200, height: 200 }}
             />
           </View>
