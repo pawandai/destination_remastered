@@ -5,7 +5,7 @@ import { TextInput, Title, Button } from 'react-native-paper';
 import { loginStyles } from '../../styles/auth.styles';
 import { auth, db } from '../../database/firebaseConfig';
 import Toast from 'react-native-toast-message';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, setDoc } from 'firebase/firestore';
 import { updateProfile } from 'firebase/auth';
 
 export default function SignUpScreen({ navigation }) {

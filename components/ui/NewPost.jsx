@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { KeyboardAvoidingView, StyleSheet, Text, View } from 'react-native';
-import { TextInput, Button, Switch } from 'react-native-paper';
+import { TextInput, Button } from 'react-native-paper';
 import { loginStyles } from '../../styles/auth.styles';
 import { Avatar } from 'react-native-paper';
-import DropdownComponent from '../shared/Dropdown';
 import { auth, db } from '../../database/firebaseConfig';
-import { collection, doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { collection, doc, setDoc } from 'firebase/firestore';
 
 const NewPost = () => {
   // const [isSwitchOn, setIsSwitchOn] = useState(false);
@@ -32,15 +31,17 @@ const NewPost = () => {
 
   const postToDatabase = () => {
     try {
-      const postRef = doc(collection(db, `collections/${user.email}/posts`));
+      const postRef = doc(collection(db, `posts`));
       setDoc(postRef, {
-        id: user.uid,
+        creator: user.uid,
         content: postContent,
         likes: [],
         shares: [],
         comments: [],
-        created: serverTimestamp(Date),
-        postedDate: date + ' ' + months[month],
+        created: new Date(),
+        createdDate: date + ' ' + months[month],
+        profilePicture: user.photoURL,
+        creatorName: user.displayName,
       });
     } catch (error) {
       console.log('Error: ' + error);

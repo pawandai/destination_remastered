@@ -9,6 +9,7 @@ import HomeNavigation from './pages/HomeNavigation';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export const NavigationContext = createContext();
+
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
