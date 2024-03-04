@@ -21,10 +21,10 @@ export default function HomeNavigation() {
         }}
       />
       <Tab.Screen
-        name='Posts'
+        name='New Post'
         component={NewPost}
         options={{
-          tabBarLabel: 'Posts',
+          tabBarLabel: 'New Post',
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons
               name='post-outline'

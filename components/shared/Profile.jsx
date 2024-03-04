@@ -7,7 +7,7 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { signOut } from 'firebase/auth';
-import { Avatar } from 'react-native-paper';
+import { Avatar, Button } from 'react-native-paper';
 import { auth } from '../../database/firebaseConfig';
 import { NavigationContext } from '../../App';
 import ProfileUpdateForm from '../ui/ProfileUpdateForm';
@@ -70,12 +70,14 @@ const Profile = () => {
 
               <Text style={{ fontSize: 17 }}>{fullName}</Text>
             </View>
-            <View
-              style={{
+            <Button
+              icon='logout'
+              contentStyle={{
                 display: 'flex',
-                flexDirection: 'row',
                 alignItems: 'center',
-                gap: 5,
+                justifyContent: 'center',
+                flexDirection: 'row-reverse',
+                fontSize: 17,
               }}
               onPress={() => {
                 signOut(auth)
@@ -87,13 +89,8 @@ const Profile = () => {
                   });
               }}
             >
-              <Text style={{ fontSize: 17 }}>Logout</Text>
-              <MaterialCommunityIcons
-                name='logout'
-                color={'#092303'}
-                size={35}
-              />
-            </View>
+              Logout
+            </Button>
           </View>
 
           <ProfileUpdateForm setRefreshing={setRefreshing} />

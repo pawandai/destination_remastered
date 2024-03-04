@@ -4,12 +4,48 @@ import { TextInput, Button, Switch } from 'react-native-paper';
 import { loginStyles } from '../../styles/auth.styles';
 import { Avatar } from 'react-native-paper';
 import DropdownComponent from '../shared/Dropdown';
-import { auth } from '../../database/firebaseConfig';
+import { auth, db } from '../../database/firebaseConfig';
+import { collection, doc, serverTimestamp, setDoc } from 'firebase/firestore';
 
 const NewPost = () => {
-  const [isSwitchOn, setIsSwitchOn] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(null);
+  // const [isSwitchOn, setIsSwitchOn] = useState(false);
+  // const [selectedItem, setSelectedItem] = useState(null);
+  const [postContent, setPostContent] = useState('');
+  const date = new Date().getDate();
+  const month = new Date().getMonth();
+  //const year = new Date().getFullYear();
+  const months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
   const user = auth.currentUser;
+
+  const postToDatabase = () => {
+    try {
+      const postRef = doc(collection(db, `collections/${user.email}/posts`));
+      setDoc(postRef, {
+        id: user.uid,
+        content: postContent,
+        likes: [],
+        shares: [],
+        comments: [],
+        created: serverTimestamp(Date),
+        postedDate: date + ' ' + months[month],
+      });
+    } catch (error) {
+      console.log('Error: ' + error);
+    }
+  };
 
   return (
     <>
@@ -29,9 +65,10 @@ const NewPost = () => {
               numberOfLines={6}
               style={loginStyles.input}
               label='Post'
+              onChangeText={(text) => setPostContent(text)}
             />
             {/* Post as anonymous */}
-            <View style={styles.ananymous}>
+            {/* <View style={styles.ananymous}>
               <Text style={{ fontSize: 17 }}>Post as anonymous</Text>
               <Switch
                 value={isSwitchOn}
@@ -39,16 +76,16 @@ const NewPost = () => {
                   setIsSwitchOn((prev) => !prev);
                 }}
               />
-            </View>
+            </View> */}
             {/* Visibility */}
-            <View>
+            {/* <View>
               <DropdownComponent />
-            </View>
+            </View> */}
             <Button
               mode='elevated'
               style={loginStyles.signInButton}
               icon='upload'
-              onPress={() => {}}
+              onPress={postToDatabase}
             >
               Post
             </Button>

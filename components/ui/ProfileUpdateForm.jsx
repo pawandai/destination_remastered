@@ -121,6 +121,7 @@ const ProfileUpdateForm = () => {
       <Button
         mode='elevated'
         style={{ ...loginStyles.signInButton }}
+        contentStyle={{ flexDirection: 'row-reverse' }}
         icon='upload'
         onPress={() => {
           // setRefreshing(true);
