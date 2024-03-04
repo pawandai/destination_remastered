@@ -7,11 +7,10 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { signOut } from 'firebase/auth';
-import { Avatar, Button } from 'react-native-paper';
+import { Avatar, IconButton } from 'react-native-paper';
 import { auth } from '../../database/firebaseConfig';
 import { NavigationContext } from '../../App';
 import ProfileUpdateForm from '../ui/ProfileUpdateForm';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const Profile = () => {
   const navigation = useContext(NavigationContext);
@@ -65,19 +64,16 @@ const Profile = () => {
               {profilePicture ? (
                 <Avatar.Image size={48} source={{ uri: profilePicture }} />
               ) : (
-                <Avatar.Icon size={48} icon='folder' />
+                <Avatar.Icon size={48} icon='account' />
               )}
 
               <Text style={{ fontSize: 17 }}>{fullName}</Text>
             </View>
-            <Button
+            <IconButton
               icon='logout'
               contentStyle={{
                 display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
                 flexDirection: 'row-reverse',
-                fontSize: 17,
               }}
               onPress={() => {
                 signOut(auth)
@@ -88,9 +84,7 @@ const Profile = () => {
                     console.log('navigation error: ', error);
                   });
               }}
-            >
-              Logout
-            </Button>
+            />
           </View>
 
           <ProfileUpdateForm setRefreshing={setRefreshing} />

@@ -1,5 +1,5 @@
 import { View, Image } from 'react-native';
-import { TextInput, Button } from 'react-native-paper';
+import { TextInput, Button, IconButton } from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useEffect, useState } from 'react';
 import { ref, uploadBytes, getDownloadURL } from '@firebase/storage';
@@ -76,10 +76,10 @@ const ProfileUpdateForm = () => {
       <View
         style={{
           display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'flex-end',
-          gap: -20,
-          marginBottom: 50,
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 10,
+          marginBottom: 40,
         }}
       >
         {user.photoURL || profileImage ? (
@@ -96,13 +96,9 @@ const ProfileUpdateForm = () => {
             size={180}
           />
         )}
-        <MaterialCommunityIcons
-          style={{ zIndex: 10 }}
-          name='upload'
-          color={'#092303'}
-          size={40}
-          onPress={pickImage}
-        />
+        <Button icon='upload' onPress={pickImage}>
+          Upload Image
+        </Button>
       </View>
       <TextInput
         value={newName}
@@ -122,7 +118,7 @@ const ProfileUpdateForm = () => {
         mode='elevated'
         style={{ ...loginStyles.signInButton }}
         contentStyle={{ flexDirection: 'row-reverse' }}
-        icon='upload'
+        icon='update'
         onPress={() => {
           // setRefreshing(true);
           updateProfile(user, {

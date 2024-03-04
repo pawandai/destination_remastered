@@ -7,6 +7,7 @@ import AuthScreen from './components/auth/AuthScreen';
 import { auth } from './database/firebaseConfig';
 import HomeNavigation from './pages/HomeNavigation';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { Provider } from 'react-native-paper';
 
 export const NavigationContext = createContext();
 
@@ -26,15 +27,17 @@ export default function App() {
   }, []);
 
   return (
-    <SafeAreaProvider>
-      <NavigationContext.Provider value={null}>
-        <NavigationContainer>
-          {isAuthenticated ? <HomeNavigation /> : <AuthScreen />}
-          <Toast />
-          <StatusBar style='auto' />
-        </NavigationContainer>
-      </NavigationContext.Provider>
-    </SafeAreaProvider>
+    <Provider>
+      <SafeAreaProvider>
+        <NavigationContext.Provider value={null}>
+          <NavigationContainer>
+            {isAuthenticated ? <HomeNavigation /> : <AuthScreen />}
+            <Toast />
+            <StatusBar style='auto' />
+          </NavigationContainer>
+        </NavigationContext.Provider>
+      </SafeAreaProvider>
+    </Provider>
   );
 }
 
