@@ -29,7 +29,6 @@ const PostCard = ({ post }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [comment, setComment] = useState('');
   const [commentsArray, setCommentsArray] = useState([]);
-  const [numCommentsFetched, setNumCommentsFetched] = useState(0);
 
   // for expanding animations, calculating the height window
   const initialCardHeight = height * 0.2; // Adjusted initial height
@@ -176,8 +175,13 @@ const PostCard = ({ post }) => {
             gap: 18,
           }}
         >
-          {commentsArray.map((comments) => (
-            <CommentCard key={comments.creator} comments={comments} />
+          {commentsArray.map((comments, index) => (
+            <CommentCard
+              key={index}
+              post={post}
+              index={index}
+              comments={comments}
+            />
           ))}
         </View>
         <View
@@ -193,7 +197,7 @@ const PostCard = ({ post }) => {
           }}
         >
           <TextInput
-            style={{ flex: 1 }}
+            style={{ flex: 1, paddingVertical: -8 }}
             type='text'
             placeholder='Comment'
             mode='outlined'

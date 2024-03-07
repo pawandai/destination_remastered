@@ -1,12 +1,31 @@
 import { StyleSheet, View, Text } from 'react-native';
 import { Avatar, IconButton, Card, Button } from 'react-native-paper';
-import { timeAgo } from '../../utils/timeFunctions';
-import { auth } from '../../database/firebaseConfig';
+import { auth, db } from '../../database/firebaseConfig';
+import { commentTimeAgo } from '../../utils/timeFunctions';
+import { useState } from 'react';
+import { arrayRemove, doc, updateDoc } from 'firebase/firestore';
 
-const CommentCard = ({ comments }) => {
+const CommentCard = ({ comments, post, index }) => {
+  const [showConfirmation, setShowConfirmation] = useState(false);
   const user = auth.currentUser;
-  const age = timeAgo(comments.createdAt);
-  const createdAgo = age.split(' ')[0] + age.split(' ')[1];
+  const age = commentTimeAgo(comments.createdAt.seconds);
+
+  // Edit the user comment
+  const editComment = () => {};
+
+  // Delete the user comment
+  const deleteComment = async () => {
+    try {
+      const commentRef = doc(db, 'posts', post.id);
+      await updateDoc(commentRef, {
+        comments: arrayRemove(index),
+      });
+      console.log('Comment deleted successfully');
+      setShowConfirmation(false);
+    } catch (error) {
+      console.log('Error deleting comment');
+    }
+  };
 
   const LeftContent = (props) => (
     <Avatar.Image {...props} source={{ uri: comments.profilePicture }} />
@@ -22,13 +41,13 @@ const CommentCard = ({ comments }) => {
       }}
     >
       <IconButton
-        onPress={() => {}}
+        onPress={editComment}
         {...props}
         icon='pencil-outline'
         iconColor='green'
       />
       <IconButton
-        onPress={() => {}}
+        onPress={() => setShowConfirmation(true)}
         {...props}
         icon='trash-can-outline'
         iconColor='red'
@@ -44,24 +63,50 @@ const CommentCard = ({ comments }) => {
           fontSize: 16,
         }}
         title={comments.creatorName}
-        subtitle={createdAgo}
+        subtitle={age}
         subtitleStyle={{ color: 'grey' }}
         left={LeftContent}
         right={user.uid === comments.creator ? UserRightContent : ''}
       />
       <Card.Content>
-        <Text variant='bodyLarge'>{comments.comment}</Text>
+        <Text variant='bodyLarge'>
+          {!showConfirmation
+            ? comments.comment
+            : 'Are you sure you want to proceed ?'}
+        </Text>
       </Card.Content>
 
       {user ? (
-        <View style={styles.actionsContainer}>
-          <Button mode='default' icon='heart-outline'>
-            0
-          </Button>
-          <Button mode='default' icon='comment-text-outline'>
-            0
-          </Button>
-        </View>
+        !showConfirmation ? (
+          <View style={styles.actionsContainer}>
+            {/* Like the comment */}
+            <Button mode='default' icon='heart-outline'>
+              0
+            </Button>
+            {/* Reply to the comment */}
+            <Button mode='default' icon='comment-text-outline'>
+              0
+            </Button>
+          </View>
+        ) : (
+          <View style={styles.actionsContainer}>
+            <Button
+              mode='default'
+              icon='window-close'
+              onPress={() => setShowConfirmation(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              labelStyle={{ color: 'red' }}
+              mode='default'
+              icon='check'
+              onPress={deleteComment}
+            >
+              Delete
+            </Button>
+          </View>
+        )
       ) : null}
     </Card>
   );
@@ -76,7 +121,7 @@ const styles = StyleSheet.create({
   card: {},
   actionsContainer: {
     marginHorizontal: 20,
-    marginBottom: 10,
+    marginVertical: 10,
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
