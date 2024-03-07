@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -7,47 +7,59 @@ import {
   LayoutAnimation,
   ScrollView,
 } from 'react-native';
-import { Avatar, IconButton, Card, Text, Button } from 'react-native-paper';
+import {
+  Avatar,
+  IconButton,
+  Card,
+  Text,
+  Button,
+  TextInput,
+} from 'react-native-paper';
 import { timeAgo } from '../../utils/timeFunctions';
-import { auth } from '../../database/firebaseConfig';
+import { auth, db } from '../../database/firebaseConfig';
 import CommentCard from './CommentCard';
+import { doc, updateDoc, arrayUnion, getDoc } from 'firebase/firestore';
 
 const { height } = Dimensions.get('window');
 
-const PostCard = ({ imageUrl, name, cardContent, created, creator }) => {
+const PostCard = ({ post }) => {
   const user = auth.currentUser;
+
+  // State variables goes here
   const [isExpanded, setIsExpanded] = useState(false);
+  const [comment, setComment] = useState('');
+  const [commentsArray, setCommentsArray] = useState([]);
+  const [numCommentsFetched, setNumCommentsFetched] = useState(0);
+
+  // for expanding animations, calculating the height window
   const initialCardHeight = height * 0.2; // Adjusted initial height
   const expandedCardHeight = height * 0.76; // Adjusted expanded height
   const animatedHeight = new Animated.Value(initialCardHeight);
   const animatedElevation = new Animated.Value(1);
 
-  // useEffect(() => {
-  //   const initialComments = ['Initial comment'];
-  //   const additionalComments = [
-  //     'Comment 1',
-  //     'Comment 2',
-  //     'Comment 3',
-  //     'Comment 4',
-  //     'Comment 5',
-  //   ];
-  //   setComments(
-  //     isExpanded ? [...initialComments, ...additionalComments] : initialComments
-  //   );
-  // }, [isExpanded]);
+  useEffect(() => {
+    // Fetch comments from Firestore when component mounts
+    fetchComments();
+  }, []);
 
-  const comments = [
-    'This is Comment 1',
-    'This is Comment 2',
-    'This is Comment 3',
-    'This is Comment 4',
-    'This is Comment 5',
-  ];
+  const fetchComments = async () => {
+    try {
+      const postDoc = await getDoc(doc(db, 'posts', post.id));
+      if (postDoc.exists()) {
+        const postData = postDoc.data();
+        setCommentsArray(postData.comments || []); // Set comments array, if available
+      }
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+    }
+  };
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
+    setComment('');
   };
 
+  // Animation related functions
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     if (isExpanded) {
@@ -61,7 +73,7 @@ const PostCard = ({ imageUrl, name, cardContent, created, creator }) => {
       }).start();
     } else {
       Animated.spring(animatedHeight, {
-        toValue: height * 0.3,
+        toValue: initialCardHeight,
         useNativeDriver: false,
       }).start();
       Animated.spring(animatedElevation, {
@@ -72,8 +84,33 @@ const PostCard = ({ imageUrl, name, cardContent, created, creator }) => {
   }, [isExpanded]);
 
   const LeftContent = (props) => (
-    <Avatar.Image {...props} source={{ uri: imageUrl }} />
+    <Avatar.Image {...props} source={{ uri: post.profilePicture }} />
   );
+
+  // logic for posting comments to the respective posts goes here
+  const postComment = async () => {
+    if (comment.trim() === '') return; // Don't post empty comments
+
+    try {
+      const commentData = {
+        comment: comment,
+        creator: user.uid,
+        creatorName: user.displayName,
+        profilePicture: user.photoURL,
+        createdAt: new Date(),
+      };
+
+      await updateDoc(doc(db, 'posts', post.id), {
+        comments: arrayUnion(commentData),
+      });
+
+      setComment('');
+      // After posting comment, fetch comments again to update the UI with latest data
+      fetchComments();
+    } catch (error) {
+      console.error('Error posting comment:', error);
+    }
+  };
 
   const UserRightContent = (props) => (
     <View
@@ -88,7 +125,8 @@ const PostCard = ({ imageUrl, name, cardContent, created, creator }) => {
     <IconButton {...props} icon='bookmark-outline' />
   );
 
-  const age = timeAgo(created);
+  // Life span of a post
+  const age = timeAgo(post.created.seconds);
 
   return (
     <Animated.View
@@ -103,14 +141,16 @@ const PostCard = ({ imageUrl, name, cardContent, created, creator }) => {
             textAlignVertical: 'center',
             fontSize: 17,
           }}
-          title={name}
+          title={post.creatorName}
           subtitle={age}
           subtitleStyle={{ color: 'grey' }}
           left={LeftContent}
-          right={user.uid === creator ? UserRightContent : OthersRightContent}
+          right={
+            user.uid === post.creator ? UserRightContent : OthersRightContent
+          }
         />
         <Card.Content>
-          <Text variant='bodyLarge'>{cardContent}</Text>
+          <Text variant='bodyLarge'>{post.content}</Text>
         </Card.Content>
 
         <View style={styles.actionsContainer}>
@@ -131,22 +171,42 @@ const PostCard = ({ imageUrl, name, cardContent, created, creator }) => {
         <View
           style={{
             marginHorizontal: 18,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 18,
           }}
         >
-          {comments.map((comment) => (
-            <CommentCard key={comment} comment={comment} name={'Pawan Dai'} />
+          {commentsArray.map((comments) => (
+            <CommentCard key={comments.creator} comments={comments} />
           ))}
         </View>
+        <View
+          style={{
+            marginHorizontal: 18,
+            position: 'absolute',
+            top: 475,
+            left: 0,
+            right: 0,
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}
+        >
+          <TextInput
+            style={{ flex: 1 }}
+            type='text'
+            placeholder='Comment'
+            mode='outlined'
+            value={comment}
+            onChangeText={(text) => setComment(text)}
+          />
+          <IconButton
+            onPress={postComment}
+            mode='contained-tonal'
+            icon='send-outline'
+          />
+        </View>
       </Card>
-      {/* {isExpanded && (
-        <ScrollView style={styles.commentContainer}>
-          {comments.map((comment, index) => (
-            <View key={index} style={styles.commentBox}>
-              <Text>{comment}</Text>
-            </View>
-          ))}
-        </ScrollView>
-      )} */}
     </Animated.View>
   );
 };
@@ -159,6 +219,8 @@ const styles = StyleSheet.create({
   },
   card: {
     flex: 1,
+    position: 'relative',
+    padding: 1,
   },
   actionsContainer: {
     marginHorizontal: 20,

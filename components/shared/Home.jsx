@@ -52,14 +52,7 @@ const Home = () => {
         <View style={{ marginVertical: 40 }}>
           <View>
             {posts.map((post) => (
-              <PostCard
-                key={post.id}
-                imageUrl={post.profilePicture}
-                creator={post.creator}
-                name={post.creatorName}
-                cardContent={post.content}
-                created={post.created.seconds}
-              />
+              <PostCard key={post.id} post={post} />
             ))}
           </View>
         </View>

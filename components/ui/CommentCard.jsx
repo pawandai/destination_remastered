@@ -3,27 +3,36 @@ import { Avatar, IconButton, Card, Button } from 'react-native-paper';
 import { timeAgo } from '../../utils/timeFunctions';
 import { auth } from '../../database/firebaseConfig';
 
-const CommentCard = ({ comment, name, created, creator, imageUrl }) => {
+const CommentCard = ({ comments }) => {
   const user = auth.currentUser;
-  const age = timeAgo(created);
+  const age = timeAgo(comments.createdAt);
   const createdAgo = age.split(' ')[0] + age.split(' ')[1];
 
   const LeftContent = (props) => (
-    <Avatar.Image {...props} source={{ uri: imageUrl }} />
+    <Avatar.Image {...props} source={{ uri: comments.profilePicture }} />
   );
 
   const UserRightContent = (props) => (
     <View
-      style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}
+      style={{
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: -10,
+      }}
     >
-      <IconButton {...props} icon='pencil-outline' iconColor='green' />
-      <IconButton {...props} icon='trash-can-outline' iconColor='red' />
-    </View>
-  );
-
-  const OtherRightContent = (props) => (
-    <View {...props}>
-      <Text>Edit</Text>
+      <IconButton
+        onPress={() => {}}
+        {...props}
+        icon='pencil-outline'
+        iconColor='green'
+      />
+      <IconButton
+        onPress={() => {}}
+        {...props}
+        icon='trash-can-outline'
+        iconColor='red'
+      />
     </View>
   );
 
@@ -34,21 +43,26 @@ const CommentCard = ({ comment, name, created, creator, imageUrl }) => {
           textAlignVertical: 'center',
           fontSize: 16,
         }}
-        title={name + ' | ' + createdAgo}
-        subtitle={comment}
+        title={comments.creatorName}
+        subtitle={createdAgo}
         subtitleStyle={{ color: 'grey' }}
         left={LeftContent}
-        right={user.uid === creator ? UserRightContent : OtherRightContent}
+        right={user.uid === comments.creator ? UserRightContent : ''}
       />
+      <Card.Content>
+        <Text variant='bodyLarge'>{comments.comment}</Text>
+      </Card.Content>
 
-      <View style={styles.actionsContainer}>
-        <Button mode='default' icon='heart-outline'>
-          0
-        </Button>
-        <Button mode='default' icon='reply'>
-          0
-        </Button>
-      </View>
+      {user ? (
+        <View style={styles.actionsContainer}>
+          <Button mode='default' icon='heart-outline'>
+            0
+          </Button>
+          <Button mode='default' icon='comment-text-outline'>
+            0
+          </Button>
+        </View>
+      ) : null}
     </Card>
   );
 };
@@ -59,12 +73,10 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: 'hidden',
   },
-  card: {
-    // flex: 1,
-  },
+  card: {},
   actionsContainer: {
     marginHorizontal: 20,
-    marginVertical: 10,
+    marginBottom: 10,
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
