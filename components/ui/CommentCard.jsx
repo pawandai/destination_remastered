@@ -5,7 +5,13 @@ import { commentTimeAgo } from '../../utils/timeFunctions';
 import { useState } from 'react';
 import { arrayRemove, doc, updateDoc } from 'firebase/firestore';
 
-const CommentCard = ({ comments, post, index }) => {
+const CommentCard = ({
+  comments,
+  post,
+  setCommentsArray,
+  index,
+  commentsArray,
+}) => {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const user = auth.currentUser;
   const age = commentTimeAgo(comments.createdAt.seconds);
@@ -17,13 +23,14 @@ const CommentCard = ({ comments, post, index }) => {
   const deleteComment = async () => {
     try {
       const commentRef = doc(db, 'posts', post.id);
+      setCommentsArray((prev) => prev.splice([index], 1));
       await updateDoc(commentRef, {
-        comments: arrayRemove(index),
+        comments: commentsArray,
       });
       console.log('Comment deleted successfully');
       setShowConfirmation(false);
     } catch (error) {
-      console.log('Error deleting comment');
+      console.log('Error deleting comment ', error);
     }
   };
 

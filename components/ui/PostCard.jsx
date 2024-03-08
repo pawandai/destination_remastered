@@ -181,6 +181,8 @@ const PostCard = ({ post }) => {
               post={post}
               index={index}
               comments={comments}
+              setCommentsArray={setCommentsArray}
+              commentsArray={commentsArray}
             />
           ))}
         </View>
