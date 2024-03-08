@@ -1,9 +1,15 @@
 import { StyleSheet, View, Text } from 'react-native';
-import { Avatar, IconButton, Card, Button } from 'react-native-paper';
+import {
+  Avatar,
+  IconButton,
+  Card,
+  Button,
+  TextInput,
+} from 'react-native-paper';
 import { auth, db } from '../../database/firebaseConfig';
 import { commentTimeAgo } from '../../utils/timeFunctions';
 import { useState } from 'react';
-import { arrayRemove, doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc } from 'firebase/firestore';
 
 const CommentCard = ({
   comments,
@@ -11,13 +17,42 @@ const CommentCard = ({
   setCommentsArray,
   index,
   commentsArray,
+  fetchComments,
 }) => {
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [newComment, setNewComment] = useState('');
   const user = auth.currentUser;
   const age = commentTimeAgo(comments.createdAt.seconds);
 
   // Edit the user comment
-  const editComment = () => {};
+  const editComment = () => {
+    setNewComment(comments.comment);
+    setIsEditing(true);
+    setShowConfirmation(true);
+  };
+  const editCommentHandler = async () => {
+    try {
+      const commentRef = doc(db, 'posts', post.id);
+      const updatedComments = commentsArray.map((databaseComment) => {
+        // Check for comment ID match
+        if (databaseComment.id === comments.id) {
+          return { ...databaseComment, comment: newComment, edited: true };
+        } else {
+          return databaseComment; // Keep other comments unchanged
+        }
+      });
+
+      await updateDoc(commentRef, { comments: updatedComments }).then(() => {
+        setIsEditing(false);
+        setShowConfirmation(false);
+        fetchComments();
+      });
+      console.log('Comment updated successfully!');
+    } catch (error) {
+      console.error('Error updating comment:', error);
+    }
+  };
 
   // Delete the user comment
   const deleteComment = async () => {
@@ -26,9 +61,11 @@ const CommentCard = ({
       setCommentsArray((prev) => prev.splice([index], 1));
       await updateDoc(commentRef, {
         comments: commentsArray,
+      }).then(() => {
+        setShowConfirmation(false);
+        console.log('Comment deleted successfully');
+        fetchComments();
       });
-      console.log('Comment deleted successfully');
-      setShowConfirmation(false);
     } catch (error) {
       console.log('Error deleting comment ', error);
     }
@@ -54,7 +91,10 @@ const CommentCard = ({
         iconColor='green'
       />
       <IconButton
-        onPress={() => setShowConfirmation(true)}
+        onPress={() => {
+          setIsEditing(false);
+          setShowConfirmation(true);
+        }}
         {...props}
         icon='trash-can-outline'
         iconColor='red'
@@ -70,16 +110,24 @@ const CommentCard = ({
           fontSize: 16,
         }}
         title={comments.creatorName}
-        subtitle={age}
+        subtitle={`${age} ${comments.edited ? '(edited)' : ''}`}
         subtitleStyle={{ color: 'grey' }}
         left={LeftContent}
         right={user.uid === comments.creator ? UserRightContent : ''}
       />
       <Card.Content>
         <Text variant='bodyLarge'>
-          {!showConfirmation
-            ? comments.comment
-            : 'Are you sure you want to proceed ?'}
+          {!showConfirmation ? (
+            comments.comment
+          ) : isEditing ? (
+            <TextInput
+              placeholder='Edit Comment'
+              value={newComment}
+              onChangeText={(text) => setNewComment(text)}
+            />
+          ) : (
+            'Are you sure you want to proceed ?'
+          )}
         </Text>
       </Card.Content>
 
@@ -104,14 +152,27 @@ const CommentCard = ({
             >
               Cancel
             </Button>
-            <Button
-              labelStyle={{ color: 'red' }}
-              mode='default'
-              icon='check'
-              onPress={deleteComment}
-            >
-              Delete
-            </Button>
+            {!isEditing ? (
+              <Button
+                labelStyle={{ color: 'red' }}
+                mode='default'
+                icon='check'
+                onPress={deleteComment}
+              >
+                Delete
+              </Button>
+            ) : (
+              <Button
+                labelStyle={{ color: 'green' }}
+                mode='default'
+                icon='check'
+                onPress={() => {
+                  editCommentHandler(comments.id);
+                }}
+              >
+                Edit
+              </Button>
+            )}
           </View>
         )
       ) : null}

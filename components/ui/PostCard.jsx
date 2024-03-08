@@ -92,11 +92,13 @@ const PostCard = ({ post }) => {
 
     try {
       const commentData = {
+        id: Math.random() * 10000000000,
         comment: comment,
         creator: user.uid,
         creatorName: user.displayName,
         profilePicture: user.photoURL,
         createdAt: new Date(),
+        edited: false,
       };
 
       await updateDoc(doc(db, 'posts', post.id), {
@@ -183,6 +185,7 @@ const PostCard = ({ post }) => {
               comments={comments}
               setCommentsArray={setCommentsArray}
               commentsArray={commentsArray}
+              fetchComments={fetchComments}
             />
           ))}
         </View>
