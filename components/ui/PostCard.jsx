@@ -18,17 +18,26 @@ import {
 import { timeAgo } from '../../utils/timeFunctions';
 import { auth, db } from '../../database/firebaseConfig';
 import CommentCard from './CommentCard';
-import { doc, updateDoc, arrayUnion, getDoc } from 'firebase/firestore';
+import {
+  doc,
+  updateDoc,
+  arrayUnion,
+  getDoc,
+  deleteDoc,
+} from 'firebase/firestore';
 
 const { height } = Dimensions.get('window');
 
-const PostCard = ({ post }) => {
+const PostCard = ({ post, fetchPosts }) => {
   const user = auth.currentUser;
 
   // State variables goes here
   const [isExpanded, setIsExpanded] = useState(false);
   const [comment, setComment] = useState('');
   const [commentsArray, setCommentsArray] = useState([]);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [newPostContent, setNewPostContent] = useState('');
 
   // for expanding animations, calculating the height window
   const initialCardHeight = height * 0.2; // Adjusted initial height
@@ -41,6 +50,7 @@ const PostCard = ({ post }) => {
     fetchComments();
   }, []);
 
+  // Fetch comments from Firestore when component mounts
   const fetchComments = async () => {
     try {
       const postDoc = await getDoc(doc(db, 'posts', post.id));
@@ -53,8 +63,41 @@ const PostCard = ({ post }) => {
     }
   };
 
+  // Delete post from the firestore database
+  const deletePost = async () => {
+    try {
+      const postRef = doc(db, 'posts', post.id);
+      await deleteDoc(postRef).then(() => {
+        setShowConfirmation(false);
+        console.log('Post deleted successfully');
+        fetchPosts();
+      });
+    } catch (error) {
+      console.log('Error while deleting post: ', error);
+    }
+  };
+
+  // Edit posts
+  const editPost = async () => {
+    try {
+      const postRef = doc(db, 'posts', post.id);
+      await updateDoc(postRef, {
+        ...post,
+        content: newPostContent,
+        edited: true,
+      }).then(() => {
+        fetchPosts();
+        setShowConfirmation(false);
+        setIsEditing(false);
+        console.log('Post updated successfully !');
+      });
+    } catch (error) {
+      console.log('Error while editing post: ', error);
+    }
+  };
+
   const toggleExpand = () => {
-    setIsExpanded(!isExpanded);
+    setIsExpanded((prev) => !prev);
     setComment('');
   };
 
@@ -117,8 +160,25 @@ const PostCard = ({ post }) => {
     <View
       style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}
     >
-      <IconButton {...props} icon='pencil-outline' iconColor='green' />
-      <IconButton {...props} icon='trash-can-outline' iconColor='red' />
+      <IconButton
+        {...props}
+        icon='pencil-outline'
+        iconColor='green'
+        onPress={() => {
+          setShowConfirmation(true);
+          setIsEditing(true);
+          setNewPostContent(post.content);
+        }}
+      />
+      <IconButton
+        {...props}
+        icon='trash-can-outline'
+        iconColor='red'
+        onPress={() => {
+          setShowConfirmation(true);
+          setIsEditing(false);
+        }}
+      />
     </View>
   );
 
@@ -143,7 +203,7 @@ const PostCard = ({ post }) => {
             fontSize: 17,
           }}
           title={post.creatorName}
-          subtitle={age}
+          subtitle={`${age} ${post.edited ? '(edited)' : ''}`}
           subtitleStyle={{ color: 'grey' }}
           left={LeftContent}
           right={
@@ -151,24 +211,83 @@ const PostCard = ({ post }) => {
           }
         />
         <Card.Content>
-          <Text variant='bodyLarge'>{post.content}</Text>
+          {!showConfirmation ? (
+            <Text variant='bodyLarge'>{post.content}</Text>
+          ) : isEditing ? (
+            <TextInput
+              placeholder='Edit Post'
+              value={newPostContent}
+              style={{
+                position: 'absolute',
+                top: -60,
+                width: '112%',
+                display: 'flex',
+                marginHorizontal: 'auto',
+                justifyContent: 'center',
+              }}
+              multiline={true}
+              numberOfLines={3}
+              onChangeText={(text) => setNewPostContent(text)}
+            />
+          ) : (
+            <Text>Are you sure you want to delete this post?</Text>
+          )}
+          {showConfirmation && isEditing ? (
+            <View style={{ height: 20 }}></View>
+          ) : (
+            ''
+          )}
         </Card.Content>
 
-        <View style={styles.actionsContainer}>
-          <Button mode='default' icon='heart-outline'>
-            0
-          </Button>
-          <Button
-            onPress={toggleExpand}
-            mode='default'
-            icon='comment-text-outline'
-          >
-            0
-          </Button>
-          <Button mode='default' icon='share-outline'>
-            0
-          </Button>
-        </View>
+        {!showConfirmation ? (
+          <View style={styles.actionsContainer}>
+            <Button mode='default' icon='heart-outline'>
+              0
+            </Button>
+            <Button
+              onPress={toggleExpand}
+              mode='default'
+              icon='comment-text-outline'
+            >
+              0
+            </Button>
+            <Button mode='default' icon='share-outline'>
+              0
+            </Button>
+          </View>
+        ) : (
+          <View style={styles.actionsContainer}>
+            <Button
+              mode='default'
+              icon='window-close'
+              onPress={() => {
+                setShowConfirmation(false);
+              }}
+            >
+              Cancel
+            </Button>
+            {!isEditing ? (
+              <Button
+                mode='default'
+                icon='check'
+                labelStyle={{ color: 'red' }}
+                onPress={deletePost}
+              >
+                Delete
+              </Button>
+            ) : (
+              <Button
+                mode='default'
+                icon='check'
+                labelStyle={{ color: 'green' }}
+                onPress={editPost}
+              >
+                Edit
+              </Button>
+            )}
+          </View>
+        )}
+
         <View
           style={{
             marginHorizontal: 18,

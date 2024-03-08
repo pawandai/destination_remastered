@@ -26,19 +26,20 @@ const Home = () => {
     }, 2000);
   }, []);
 
-  useEffect(() => {
-    async function fetchPosts() {
-      try {
-        const fetchedPosts = await getDocs(postRef);
-        let tempPosts = [];
-        fetchedPosts.forEach((post) => {
-          tempPosts.push({ id: post.id, ...post.data() });
-        });
-        setPosts(tempPosts);
-      } catch (error) {
-        console.log('Fetching error: ', error);
-      }
+  async function fetchPosts() {
+    try {
+      const fetchedPosts = await getDocs(postRef);
+      let tempPosts = [];
+      fetchedPosts.forEach((post) => {
+        tempPosts.push({ id: post.id, ...post.data() });
+      });
+      setPosts(tempPosts);
+    } catch (error) {
+      console.log('Fetching error: ', error);
     }
+  }
+
+  useEffect(() => {
     fetchPosts();
   }, []);
 
@@ -52,7 +53,7 @@ const Home = () => {
         <View style={{ marginVertical: 40 }}>
           <View>
             {posts.map((post) => (
-              <PostCard key={post.id} post={post} />
+              <PostCard key={post.id} post={post} fetchPosts={fetchPosts} />
             ))}
           </View>
         </View>

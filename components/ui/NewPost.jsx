@@ -38,8 +38,8 @@ const NewPost = () => {
         likes: [],
         shares: [],
         comments: [],
+        edited: false,
         created: new Date(),
-        createdDate: date + ' ' + months[month],
         profilePicture: user.photoURL,
         creatorName: user.displayName,
       });
