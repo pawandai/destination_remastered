@@ -24,6 +24,7 @@ import {
   arrayUnion,
   getDoc,
   deleteDoc,
+  arrayRemove,
 } from 'firebase/firestore';
 
 const { height } = Dimensions.get('window');
@@ -38,6 +39,8 @@ const PostCard = ({ post, fetchPosts }) => {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [newPostContent, setNewPostContent] = useState('');
+  const [numberOfLikes, setNumberOfLikes] = useState(0);
+  const [liked, setLiked] = useState(false);
 
   // for expanding animations, calculating the height window
   const initialCardHeight = height * 0.2; // Adjusted initial height
@@ -96,6 +99,41 @@ const PostCard = ({ post, fetchPosts }) => {
     }
   };
 
+  // Like Posts
+  const likePosts = async () => {
+    const currentLikeStatus = !post.likes.includes(user.uid);
+    updateDoc(doc(db, 'posts', post.id), {
+      likes: currentLikeStatus ? arrayUnion(user.uid) : arrayRemove(user.uid),
+    });
+  };
+
+  // logic for posting comments to the respective posts goes here
+  const postComment = async () => {
+    if (comment.trim() === '') return; // Don't post empty comments
+
+    try {
+      const commentData = {
+        id: Math.random() * 10000000000,
+        comment: comment,
+        creator: user.uid,
+        creatorName: user.displayName,
+        profilePicture: user.photoURL,
+        createdAt: new Date(),
+        edited: false,
+      };
+
+      await updateDoc(doc(db, 'posts', post.id), {
+        comments: arrayUnion(commentData),
+      });
+
+      setComment('');
+      // After posting comment, fetch comments again to update the UI with latest data
+      fetchComments();
+    } catch (error) {
+      console.error('Error posting comment:', error);
+    }
+  };
+
   const toggleExpand = () => {
     setIsExpanded((prev) => !prev);
     setComment('');
@@ -128,33 +166,6 @@ const PostCard = ({ post, fetchPosts }) => {
   const LeftContent = (props) => (
     <Avatar.Image {...props} source={{ uri: post.profilePicture }} />
   );
-
-  // logic for posting comments to the respective posts goes here
-  const postComment = async () => {
-    if (comment.trim() === '') return; // Don't post empty comments
-
-    try {
-      const commentData = {
-        id: Math.random() * 10000000000,
-        comment: comment,
-        creator: user.uid,
-        creatorName: user.displayName,
-        profilePicture: user.photoURL,
-        createdAt: new Date(),
-        edited: false,
-      };
-
-      await updateDoc(doc(db, 'posts', post.id), {
-        comments: arrayUnion(commentData),
-      });
-
-      setComment('');
-      // After posting comment, fetch comments again to update the UI with latest data
-      fetchComments();
-    } catch (error) {
-      console.error('Error posting comment:', error);
-    }
-  };
 
   const UserRightContent = (props) => (
     <View
@@ -227,6 +238,7 @@ const PostCard = ({ post, fetchPosts }) => {
               }}
               multiline={true}
               numberOfLines={3}
+              scrollEnabled={true}
               onChangeText={(text) => setNewPostContent(text)}
             />
           ) : (
@@ -241,8 +253,12 @@ const PostCard = ({ post, fetchPosts }) => {
 
         {!showConfirmation ? (
           <View style={styles.actionsContainer}>
-            <Button mode='default' icon='heart-outline'>
-              0
+            <Button
+              mode='default'
+              icon={post.likes.includes(user.uid) ? 'heart' : 'heart-outline'}
+              onPress={likePosts}
+            >
+              {post.likes.length ? post.likes.length : 0}
             </Button>
             <Button
               onPress={toggleExpand}
