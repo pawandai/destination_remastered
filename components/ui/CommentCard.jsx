@@ -10,6 +10,7 @@ import { auth, db } from '../../database/firebaseConfig';
 import { commentTimeAgo } from '../../utils/timeFunctions';
 import { useState } from 'react';
 import { doc, updateDoc } from 'firebase/firestore';
+import Toast from 'react-native-toast-message';
 
 const CommentCard = ({
   comments,
@@ -52,6 +53,26 @@ const CommentCard = ({
     } catch (error) {
       console.error('Error updating comment:', error);
     }
+  };
+
+  const showToast = () => {
+    Toast.show({
+      type: 'error',
+      text1: 'You cannot like and reply to the comments.',
+      text2: 'We are working on that feature  ;-)',
+      text1Style: {
+        fontSize: 17,
+        fontWeight: '400',
+        textAlign: 'center',
+        color: 'rgb(0, 0, 0)',
+      },
+      text2Style: {
+        fontSize: 17,
+        fontWeight: '400',
+        textAlign: 'center',
+        color: 'rgb(0, 0, 0)',
+      },
+    });
   };
 
   // Delete the user comment
@@ -135,11 +156,15 @@ const CommentCard = ({
         !showConfirmation ? (
           <View style={styles.actionsContainer}>
             {/* Like the comment */}
-            <Button mode='default' icon='heart-outline'>
+            <Button mode='default' icon='heart-outline' onPress={showToast}>
               0
             </Button>
             {/* Reply to the comment */}
-            <Button mode='default' icon='comment-text-outline'>
+            <Button
+              mode='default'
+              icon='comment-text-outline'
+              onPress={showToast}
+            >
               0
             </Button>
           </View>
