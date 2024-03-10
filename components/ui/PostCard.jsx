@@ -51,6 +51,7 @@ const PostCard = ({ post, fetchPosts }) => {
   useEffect(() => {
     // Fetch comments from Firestore when component mounts
     fetchComments();
+    fetchPosts();
   }, []);
 
   // Fetch comments from Firestore when component mounts
@@ -104,7 +105,7 @@ const PostCard = ({ post, fetchPosts }) => {
     const currentLikeStatus = !post.likes.includes(user.uid);
     updateDoc(doc(db, 'posts', post.id), {
       likes: currentLikeStatus ? arrayUnion(user.uid) : arrayRemove(user.uid),
-    });
+    }).then(() => fetchPosts());
   };
 
   // logic for posting comments to the respective posts goes here
