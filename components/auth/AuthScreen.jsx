@@ -6,6 +6,7 @@ import {
 import LoginScreen from '../shared/LoginScreen';
 import SignUpScreen from '../shared/SignupScreen';
 import HomeNavigation from '../../pages/HomeNavigation';
+import EmailVerificationPage from '../ui/EmailVerificationPage';
 
 const Stack = createStackNavigator();
 
@@ -22,6 +23,10 @@ export default function AuthScreen() {
       >
         <Stack.Screen name='Login' component={LoginScreen} />
         <Stack.Screen name='Signup' component={SignUpScreen} />
+        <Stack.Screen
+          name='EmailVerification'
+          component={EmailVerificationPage}
+        />
         <Stack.Screen name='HomePage' component={HomeNavigation} />
       </Stack.Navigator>
     </View>

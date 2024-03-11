@@ -201,6 +201,8 @@ const PostCard = ({ post, fetchPosts }) => {
   // Life span of a post
   const age = timeAgo(post.created.seconds);
 
+  console.log('Email verified', user.emailVerified);
+
   return (
     <Animated.View
       style={[
