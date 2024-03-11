@@ -18,19 +18,32 @@ export default function LoginScreen({ navigation }) {
         // Signed in
         const user = userCredential.user;
         console.log('Here is logged in user: ', user);
-        navigation.navigate('HomePage');
-        Toast.show({
-          type: 'success',
-          text1: 'User logged in successfully',
-          text1Style: {
-            fontSize: 17,
-            fontWeight: '400',
-            textAlign: 'center',
-            color: 'rgb(0, 0, 0)',
-          },
-        });
-        setEmail('');
-        setPassword('');
+        if (user.emailVerified) {
+          navigation.navigate('HomePage');
+          Toast.show({
+            type: 'success',
+            text1: 'User logged in successfully',
+            text1Style: {
+              fontSize: 17,
+              fontWeight: '400',
+              textAlign: 'center',
+              color: 'rgb(0, 0, 0)',
+            },
+          });
+          setEmail('');
+          setPassword('');
+        } else {
+          Toast.show({
+            type: 'error',
+            text1: 'Email is not verified !',
+            text1Style: {
+              fontSize: 17,
+              fontWeight: '400',
+              textAlign: 'center',
+              color: 'rgb(0, 0, 0)',
+            },
+          });
+        }
       })
       .catch((error) => {
         console.log(error);

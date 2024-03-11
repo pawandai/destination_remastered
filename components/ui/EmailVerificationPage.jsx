@@ -1,9 +1,23 @@
 import { Text, View } from 'react-native';
+import { Button } from 'react-native-paper';
 
-const EmailVerificationPage = () => {
+const EmailVerificationPage = ({ navigation }) => {
   return (
-    <View>
-      <Text>Email Verification Page</Text>
+    <View
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <Text>Once you verified your email, you can login to this app</Text>
+      <Button
+        onPress={() => {
+          navigation.navigate('login');
+        }}
+      >
+        Login
+      </Button>
     </View>
   );
 };

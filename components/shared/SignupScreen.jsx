@@ -41,6 +41,16 @@ export default function SignUpScreen({ navigation }) {
           });
           sendEmailVerification(auth.currentUser).then(() => {
             console.log('Email verification link send successfully.');
+            Toast.show({
+              type: 'success',
+              text1: 'Verifiction link has been sent to your email',
+              text1Style: {
+                fontSize: 17,
+                fontWeight: '400',
+                textAlign: 'center',
+                color: 'rgb(0, 0, 0)',
+              },
+            });
           });
           try {
             const docRef = await addDoc(collection(db, 'users'), {
@@ -64,12 +74,12 @@ export default function SignUpScreen({ navigation }) {
             console.error('Error adding document: ', e);
           }
           setIsLoading(false);
-          navigation.navigate('HomePage');
+          navigation.navigate('EmailVerificationPage');
         })
         .catch(() => {
           Toast.show({
             type: 'error',
-            text1: 'Cound not create user in database',
+            text1: 'Something went wrong, please use stronger password.',
             text1Style: {
               fontSize: 17,
               fontWeight: '400',

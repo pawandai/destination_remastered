@@ -23,11 +23,11 @@ export default function AuthScreen() {
       >
         <Stack.Screen name='Login' component={LoginScreen} />
         <Stack.Screen name='Signup' component={SignUpScreen} />
+        <Stack.Screen name='HomePage' component={HomeNavigation} />
         <Stack.Screen
-          name='EmailVerification'
+          name='EmailVerificationPage'
           component={EmailVerificationPage}
         />
-        <Stack.Screen name='HomePage' component={HomeNavigation} />
       </Stack.Navigator>
     </View>
   );
